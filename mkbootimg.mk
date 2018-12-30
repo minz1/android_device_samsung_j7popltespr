@@ -35,6 +35,14 @@ dtimage: $(INSTALLED_DTIMAGE_TARGET)
 
 BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x02000000 --tags_offset 0x01e00000 --board SRPPI22A000RU
 
+
+$(INSTALLED_BOOTIMAGE_TARGET): $(MKBOOTIMG) $(INTERNAL_BOOTIMAGE_FILES) $(INSTALLED_DTIMAGE_TARGET)
+	$(call pretty,"Target boot image: $@")
+	$(hide) $(MKBOOTIMG) $(INTERNAL_BOOTIMAGE_ARGS) $(BOARD_MKBOOTIMG_ARGS) --output $@
+	$(hide) echo -n "SEANDROIDENFORCE" >> $@
+	$(hide) $(call assert-max-image-size,$@,$(BOARD_BOOTIMAGE_PARTITION_SIZE),raw)
+	@echo -e ${CL_CYN}"Made boot image: $@"${CL_RST}
+
 LZMA_RAMDISK := $(PRODUCT_OUT)/ramdisk-recovery-lzma.img
 
 $(LZMA_RAMDISK): $(recovery_ramdisk)
